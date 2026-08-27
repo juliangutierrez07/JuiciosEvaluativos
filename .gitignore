@@ -1,0 +1,11 @@
+/vendor/
+/uploads/*
+!/uploads/.gitkeep
+.env
+.env.*
+!.env.example
+.codex-test-sessions/
+*.log
+.DS_Store
+Thumbs.db
+
