@@ -2,7 +2,7 @@ CREATE DATABASE IF NOT EXISTS juicios_evaluativos
   CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE juicios_evaluativos;
 
-CREATE TABLE programas (
+CREATE TABLE IF NOT EXISTS programas (
   id int unsigned NOT NULL AUTO_INCREMENT,
   nombre varchar(255) NOT NULL,
   codigo varchar(50) NOT NULL DEFAULT '',
@@ -11,7 +11,7 @@ CREATE TABLE programas (
   UNIQUE KEY uq_programas_nombre (nombre)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE fichas (
+CREATE TABLE IF NOT EXISTS fichas (
   id int unsigned NOT NULL AUTO_INCREMENT,
   programa_id int unsigned NOT NULL,
   numero varchar(20) NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE fichas (
     REFERENCES programas (id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE aprendices (
+CREATE TABLE IF NOT EXISTS aprendices (
   numero_documento varchar(20) NOT NULL,
   ficha_id int unsigned NOT NULL,
   tipo_documento enum('CC','TI') NOT NULL DEFAULT 'CC',
@@ -37,7 +37,7 @@ CREATE TABLE aprendices (
     REFERENCES fichas (id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE competencias (
+CREATE TABLE IF NOT EXISTS competencias (
   id int unsigned NOT NULL AUTO_INCREMENT,
   programa_id int unsigned NOT NULL,
   nombre varchar(500) NOT NULL,
@@ -48,7 +48,7 @@ CREATE TABLE competencias (
     REFERENCES programas (id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE resultados_aprendizaje (
+CREATE TABLE IF NOT EXISTS resultados_aprendizaje (
   id int unsigned NOT NULL AUTO_INCREMENT,
   competencia_id int unsigned NOT NULL,
   descripcion text NOT NULL,
@@ -59,7 +59,7 @@ CREATE TABLE resultados_aprendizaje (
     REFERENCES competencias (id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE juicios_evaluativos (
+CREATE TABLE IF NOT EXISTS juicios_evaluativos (
   id int unsigned NOT NULL AUTO_INCREMENT,
   numero_documento varchar(20) NOT NULL,
   resultado_id int unsigned NOT NULL,
@@ -77,7 +77,7 @@ CREATE TABLE juicios_evaluativos (
     REFERENCES resultados_aprendizaje (id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE importaciones (
+CREATE TABLE IF NOT EXISTS importaciones (
   id int unsigned NOT NULL AUTO_INCREMENT,
   nombre_archivo varchar(255) NOT NULL,
   programa_id int unsigned NOT NULL,
@@ -95,4 +95,3 @@ CREATE TABLE importaciones (
   CONSTRAINT fk_import_programa FOREIGN KEY (programa_id)
     REFERENCES programas (id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-

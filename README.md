@@ -19,6 +19,10 @@ Aplicación web en PHP para importar, consultar y consolidar juicios evaluativos
 
 Las credenciales predeterminadas para desarrollo local son `root` sin contraseña. No uses esos valores en producción.
 
+## Despliegue con Docker
+
+El proyecto incluye un `Dockerfile`. Configura `DB_HOST`, `DB_NAME`, `DB_USER` y `DB_PASS` en la plataforma y publica el puerto interno `80`. Al iniciar, la aplicación espera a MySQL y crea las tablas que todavía no existan.
+
 ## Funciones principales
 
 - Importación de archivos XLSX y XLS.
@@ -30,4 +34,3 @@ Las credenciales predeterminadas para desarrollo local son `root` sin contraseñ
 ## Privacidad
 
 El repositorio no incluye la información de aprendices ni los archivos importados. El archivo `database/schema.sql` contiene únicamente la estructura de la base de datos.
-

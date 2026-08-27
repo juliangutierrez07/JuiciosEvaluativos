@@ -19,6 +19,9 @@ function getDB(): PDO {
                 ]
             );
         } catch (PDOException $e) {
+            if (PHP_SAPI === 'cli') {
+                throw $e;
+            }
             die('<div style="font-family:sans-serif;padding:2rem;color:red">
                 <h3>Error de conexión a la base de datos</h3>
                 <p>' . htmlspecialchars($e->getMessage()) . '</p>
