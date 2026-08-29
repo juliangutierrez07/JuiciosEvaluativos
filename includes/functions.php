@@ -100,6 +100,16 @@ function barraProgreso(float $pct): string {
 // ── Ruta base dinámica ────────────────────────────────────────────────────────
 
 function base(string $path = ''): string {
-    $depth = substr_count(str_replace('\\', '/', $_SERVER['PHP_SELF']), '/') - 2;
-    return str_repeat('../', max(0, $depth)) . ltrim($path, '/');
+    $script = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? $_SERVER['PHP_SELF'] ?? '');
+    $posModulo = strpos($script, '/modules/');
+
+    if ($posModulo !== false) {
+        // Funciona con la app en un subdirectorio y también en la raíz del dominio.
+        $raiz = substr($script, 0, $posModulo);
+    } else {
+        $directorio = str_replace('\\', '/', dirname($script));
+        $raiz = $directorio === '/' || $directorio === '.' ? '' : rtrim($directorio, '/');
+    }
+
+    return ($raiz ?: '') . '/' . ltrim($path, '/');
 }
