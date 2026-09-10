@@ -65,6 +65,10 @@ function isActiveRoot(string $file): string {
     <li><a href="<?= base('modules/reportes/consolidado.php') ?>"<?= isActive('reportes') ?>>
       <i class="bi bi-table"></i> Consolidado
     </a></li>
+
+    <li><a href="<?= base('modules/mapa/index.php') ?>"<?= isActive('mapa') ?>>
+      <i class="bi bi-grid-3x3-gap-fill"></i> Mapa de calor
+    </a></li>
   </ul>
 
   <div class="sidebar-footer"></div>

@@ -928,3 +928,56 @@ table.dataTable tbody td { border-bottom: 1px solid rgba(255,255,255,.04); color
   z-index: 99; backdrop-filter: blur(2px);
 }
 #sidebar-overlay.show { display: block; }
+
+/* ── Mapa de calor por competencias ────────────────────────────────────── */
+.heatmap-heading i { color: #f59e0b; }
+.heatmap-filters .je-input { width: 100%; }
+.heatmap-summary {
+  display: grid; grid-template-columns: repeat(4,minmax(130px,1fr));
+  gap: 12px; margin-bottom: 14px;
+}
+.heatmap-stat {
+  display: flex; align-items: center; gap: 11px; min-height: 68px;
+  padding: 14px 18px; border: 1px solid rgba(255,255,255,.08);
+  border-radius: var(--radius-sm); background: rgba(255,255,255,.025);
+}
+.heatmap-stat strong { font-size: 1.45rem; line-height: 1; }
+.heatmap-stat span { color: var(--text-muted); font-size: .75rem; font-weight: 700; text-transform: uppercase; }
+.heatmap-stat.green strong { color: #34d399; }
+.heatmap-stat.yellow strong { color: #fbbf24; }
+.heatmap-stat.red strong { color: #fb7185; }
+.heatmap-stat.empty strong { color: #94a3b8; }
+.heatmap-legend { display: flex; flex-wrap: wrap; gap: 18px; margin: 0 0 14px; color: var(--text-muted); font-size: .78rem; }
+.heatmap-legend span { display: inline-flex; align-items: center; gap: 7px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.legend-dot.green { background: #10b981; }
+.legend-dot.yellow { background: #f59e0b; }
+.legend-dot.red { background: #ef4444; }
+.legend-dot.empty { background: #475569; }
+.heatmap-card { overflow: hidden; }
+.heatmap-scroll { overflow: auto; max-height: 68vh; }
+.heatmap-table { border-collapse: separate; border-spacing: 4px; min-width: 100%; padding: 8px; }
+.heatmap-table th { position: sticky; top: 0; z-index: 4; min-width: 66px; height: 52px; padding: 8px; background: #181130; color: #c4b5fd; text-align: center; font-size: .72rem; border-radius: 7px; }
+.heatmap-table td { height: 48px; padding: 7px 10px; border-radius: 7px; text-align: center; font-size: .75rem; font-weight: 800; }
+.heatmap-table .sticky-col { position: sticky; z-index: 3; background: #17102d; text-align: left; }
+.heatmap-table th.sticky-col { z-index: 6; }
+.heatmap-table .learner-col { left: 0; min-width: 235px; max-width: 235px; }
+.heatmap-table .ficha-col { left: 239px; min-width: 92px; max-width: 92px; text-align: center; }
+.heatmap-table .learner-col a { display: block; color: var(--text-main); text-decoration: none; font-size: .78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.heatmap-table .learner-col a:hover { color: #a78bfa; }
+.heatmap-table .learner-col small { display: block; margin-top: 2px; color: var(--text-dim); font-weight: 500; }
+.heat-cell.green { color: #d1fae5; background: rgba(16,185,129,.32); border: 1px solid rgba(52,211,153,.36); }
+.heat-cell.yellow { color: #fef3c7; background: rgba(245,158,11,.29); border: 1px solid rgba(251,191,36,.34); }
+.heat-cell.red { color: #ffe4e6; background: rgba(239,68,68,.3); border: 1px solid rgba(251,113,133,.34); }
+.heat-cell.empty { color: #64748b; background: rgba(71,85,105,.18); border: 1px solid rgba(100,116,139,.18); }
+.heat-cell:hover { filter: brightness(1.25); transform: scale(1.04); }
+.competence-key-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(320px,1fr)); gap: 10px 20px; }
+.competence-key-grid div { display: flex; align-items: flex-start; gap: 10px; color: var(--text-muted); font-size: .78rem; line-height: 1.45; }
+.competence-key-grid strong { flex: 0 0 34px; color: #c4b5fd; }
+
+@media (max-width: 768px) {
+  .heatmap-summary { grid-template-columns: repeat(2,1fr); }
+  .heatmap-table .learner-col { min-width: 190px; max-width: 190px; }
+  .heatmap-table .ficha-col { left: 194px; }
+  .competence-key-grid { grid-template-columns: 1fr; }
+}
