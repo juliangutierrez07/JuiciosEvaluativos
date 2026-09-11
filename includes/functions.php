@@ -30,18 +30,34 @@ function getFlash(): ?array {
 // ── Protección de formularios sensibles ───────────────────────────────────────────────
 
 function csrfToken(): string {
-    if (session_status() === PHP_SESSION_NONE) session_start();
-    if (empty($_SESSION['csrf_token'])) {
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    static $token = null;
+    if ($token !== null) return $token;
+
+    $cookieToken = $_COOKIE['csrf_token'] ?? '';
+    if (is_string($cookieToken) && preg_match('/^[a-f0-9]{64}$/', $cookieToken)) {
+        return $token = $cookieToken;
     }
-    return $_SESSION['csrf_token'];
+
+    $token = bin2hex(random_bytes(32));
+    $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || strtolower($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https';
+    setcookie('csrf_token', $token, [
+        'expires' => time() + 86400,
+        'path' => '/',
+        'secure' => $https,
+        'httponly' => true,
+        'samesite' => 'Strict',
+    ]);
+
+    return $token;
 }
 
 function csrfValido(?string $token): bool {
-    if (session_status() === PHP_SESSION_NONE) session_start();
-    return isset($_SESSION['csrf_token'])
-        && is_string($token)
-        && hash_equals($_SESSION['csrf_token'], $token);
+    $cookieToken = $_COOKIE['csrf_token'] ?? null;
+    return is_string($token)
+        && is_string($cookieToken)
+        && preg_match('/^[a-f0-9]{64}$/', $token)
+        && hash_equals($cookieToken, $token);
 }
 
 // ── Consultas frecuentes ─────────────────────────────────────────────────────

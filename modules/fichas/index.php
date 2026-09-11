@@ -162,7 +162,7 @@ function tarjetaFichaNew(array $f, array $estados, int $totalAp): void { ?>
       <div class="modal-footer">
         <button type="button" class="je-btn je-btn-outline" data-bs-dismiss="modal">Cancelar</button>
         <form method="POST" action="eliminar.php" style="display:inline">
-          <input type="hidden" name="csrf_token" value="<?= e(csrfToken()) ?>">
+          <input type="hidden" name="csrf_token" value="<?= e($csrfToken) ?>">
           <input type="hidden" name="ficha_id" id="modalFichaId">
           <button type="submit" class="je-btn je-btn-danger"><i class="bi bi-trash-fill"></i> Sí, eliminar todo</button>
         </form>
