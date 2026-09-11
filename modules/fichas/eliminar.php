@@ -28,25 +28,18 @@ if (!$ficha) {
 try {
     $db->beginTransaction();
 
-    // 1. Eliminar juicios de todos los aprendices de esta ficha
-    //    (el CASCADE en FK lo haría al borrar aprendices, pero lo hacemos explícito)
-    $db->prepare(
-        'DELETE je FROM juicios_evaluativos je
-         JOIN aprendices a ON je.numero_documento = a.numero_documento
-         WHERE a.ficha_id = ?'
-    )->execute([$fichaId]);
-
-    // 2. Eliminar aprendices
-    $db->prepare('DELETE FROM aprendices WHERE ficha_id = ?')->execute([$fichaId]);
-
-    // 3. Eliminar ficha
-    $db->prepare('DELETE FROM fichas WHERE id = ?')->execute([$fichaId]);
+    // Las claves foráneas eliminan en cascada aprendices, juicios e importaciones.
+    $eliminar = $db->prepare('DELETE FROM fichas WHERE id = ?');
+    $eliminar->execute([$fichaId]);
+    if ($eliminar->rowCount() !== 1) {
+        throw new RuntimeException('No se pudo confirmar la eliminación de la ficha.');
+    }
 
     $db->commit();
 
     flash('success', 'Ficha <strong>' . htmlspecialchars($ficha['numero']) . '</strong> eliminada correctamente junto con todos sus aprendices y juicios.');
 } catch (Throwable $e) {
-    $db->rollBack();
+    if ($db->inTransaction()) $db->rollBack();
     flash('danger', 'Error al eliminar: ' . $e->getMessage());
 }
 

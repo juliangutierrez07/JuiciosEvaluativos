@@ -161,10 +161,10 @@ function tarjetaFichaNew(array $f, array $estados, int $totalAp): void { ?>
       </div>
       <div class="modal-footer">
         <button type="button" class="je-btn je-btn-outline" data-bs-dismiss="modal">Cancelar</button>
-        <form method="POST" action="eliminar.php" style="display:inline">
+        <form method="POST" action="<?= base('modules/fichas/eliminar.php') ?>" id="formEliminarFicha" style="display:inline">
           <input type="hidden" name="csrf_token" value="<?= e($csrfToken) ?>">
           <input type="hidden" name="ficha_id" id="modalFichaId">
-          <button type="submit" class="je-btn je-btn-danger"><i class="bi bi-trash-fill"></i> Sí, eliminar todo</button>
+          <button type="submit" class="je-btn je-btn-danger" id="btnConfirmarEliminar"><i class="bi bi-trash-fill"></i> Sí, eliminar todo</button>
         </form>
       </div>
     </div>
@@ -177,6 +177,12 @@ document.getElementById('modalEliminar').addEventListener('show.bs.modal', funct
   document.getElementById('modalFichaId').value       = btn.dataset.fichaId;
   document.getElementById('modalFichaNro').textContent = 'Ficha ' + btn.dataset.fichaNumero;
   document.getElementById('modalFichaTotal').textContent = btn.dataset.fichaTotal;
+});
+
+document.getElementById('formEliminarFicha').addEventListener('submit', function() {
+  const boton = document.getElementById('btnConfirmarEliminar');
+  boton.disabled = true;
+  boton.innerHTML = '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Eliminando…';
 });
 </script>
 
