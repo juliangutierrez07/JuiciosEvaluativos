@@ -172,7 +172,12 @@ function tarjetaFichaNew(array $f, array $estados, int $totalAp): void { ?>
 </div>
 
 <script>
-document.getElementById('modalEliminar').addEventListener('show.bs.modal', function(e) {
+// El backdrop de Bootstrap se inserta en body. El modal debe ser su hermano:
+// #main-wrapper crea un contexto de apilamiento con z-index: 1.
+const modalEliminar = document.getElementById('modalEliminar');
+document.body.appendChild(modalEliminar);
+
+modalEliminar.addEventListener('show.bs.modal', function(e) {
   const btn = e.relatedTarget;
   document.getElementById('modalFichaId').value       = btn.dataset.fichaId;
   document.getElementById('modalFichaNro').textContent = 'Ficha ' + btn.dataset.fichaNumero;
