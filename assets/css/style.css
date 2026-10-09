@@ -1051,3 +1051,17 @@ table.dataTable tbody td { border-bottom: 1px solid rgba(255,255,255,.04); color
 }
 .auth-tabs a:hover { color: var(--text-main); }
 .auth-tabs a.active { background: var(--accent); color: #fff; }
+
+/* Filtros de juicios del aprendiz */
+.juicios-conteo { margin-left: auto; font-size: .75rem; font-weight: 500; color: var(--text-muted); }
+.juicios-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--card-border);
+}
+.juicios-filtros .filtro-campo { flex: 1 1 160px; min-width: 0; }
+.juicios-filtros .filtro-ancho { flex: 2 1 240px; }
+.juicios-filtros .filtro-limpiar { flex: 0 0 auto; height: 40px; }

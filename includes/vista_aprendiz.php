@@ -26,6 +26,7 @@ $todosRA = $stmt2->fetchAll();
 
 $sqlDetalleJuicios = "
     SELECT
+        c.id AS competencia_id,
         c.nombre AS competencia,
         ra.descripcion AS resultado,
         je.estado,
@@ -40,13 +41,43 @@ $sqlDetalleJuicios = "
 $stmtDetalle = $db->prepare($sqlDetalleJuicios);
 $stmtDetalle->execute([$doc, $ap['programa_id']]);
 $juiciosDetalle = $stmtDetalle->fetchAll();
+
+// ── Filtros de la tabla de juicios ──────────────────────────────────────────
+const SIN_INSTRUCTOR = 'sin-instructor';
+
 $filtroJuicio = trim($_GET['juicio'] ?? '');
-if (!in_array($filtroJuicio, ['Aprobado', 'Pendiente'], true)) {
-    $filtroJuicio = '';
-}
-$juiciosFiltrados = $filtroJuicio
-    ? array_values(array_filter($juiciosDetalle, fn($j) => $j['estado'] === $filtroJuicio))
-    : $juiciosDetalle;
+if (!in_array($filtroJuicio, ['Aprobado', 'Pendiente'], true)) $filtroJuicio = '';
+$filtroCompetencia = (int)($_GET['competencia'] ?? 0);
+$filtroInstructor  = trim((string)($_GET['instructor'] ?? ''));
+$filtroTexto       = trim((string)($_GET['q'] ?? ''));
+
+$opcionesCompetencia = array_column($juiciosDetalle, 'competencia', 'competencia_id');
+$opcionesInstructor  = array_unique(array_filter(array_column($juiciosDetalle, 'funcionario')));
+usort($opcionesInstructor, fn($x, $y) => strcmp(nombreFuncionario($x), nombreFuncionario($y)));
+$haySinInstructor = in_array(null, array_column($juiciosDetalle, 'funcionario'), true);
+
+if (!isset($opcionesCompetencia[$filtroCompetencia])) $filtroCompetencia = 0;
+if ($filtroInstructor !== SIN_INSTRUCTOR && !in_array($filtroInstructor, $opcionesInstructor, true)) $filtroInstructor = '';
+
+$juiciosFiltrados = array_values(array_filter($juiciosDetalle, function ($j) use ($filtroJuicio, $filtroCompetencia, $filtroInstructor, $filtroTexto) {
+    if ($filtroJuicio && $j['estado'] !== $filtroJuicio) return false;
+    if ($filtroCompetencia && (int)$j['competencia_id'] !== $filtroCompetencia) return false;
+    if ($filtroInstructor === SIN_INSTRUCTOR && $j['funcionario'] !== null) return false;
+    if ($filtroInstructor !== '' && $filtroInstructor !== SIN_INSTRUCTOR && $j['funcionario'] !== $filtroInstructor) return false;
+    if ($filtroTexto !== '') {
+        $texto = $j['competencia'] . ' ' . $j['resultado'] . ' ' . ($j['funcionario'] ?? '');
+        if (mb_stripos($texto, $filtroTexto) === false) return false;
+    }
+    return true;
+}));
+
+// Filtros activos que deben conservarse al cambiar uno de ellos.
+$filtrosActivos = array_filter([
+    'juicio'      => $filtroJuicio,
+    'competencia' => $filtroCompetencia ?: '',
+    'instructor'  => $filtroInstructor,
+    'q'           => $filtroTexto,
+], fn($v) => $v !== '');
 
 $porComp = [];
 foreach ($todosRA as $row) {
@@ -68,9 +99,9 @@ foreach ($porComp as $comp) {
     if ($p > $mejorPct) { $mejorPct = $p; $mejorComp = $comp['nombre']; }
 }
 $filtroComp = trim($_GET['filtro'] ?? '');
-$urlDetalle = $urlPagina();
-$urlAprobados = $urlPagina(['juicio' => 'Aprobado']);
-$urlPendientes = $urlPagina(['juicio' => 'Pendiente']);
+$urlDetalle = $urlPagina(array_diff_key($filtrosActivos, ['juicio' => 1]));
+$urlAprobados = $urlPagina(array_merge($filtrosActivos, ['juicio' => 'Aprobado']));
+$urlPendientes = $urlPagina(array_merge($filtrosActivos, ['juicio' => 'Pendiente']));
 ?>
 
 <?php if (!empty($breadcrumb)): ?>
@@ -145,13 +176,55 @@ $urlPendientes = $urlPagina(['juicio' => 'Pendiente']);
 <div class="je-card mb-4 fade-up-2 apprentice-judgements">
   <div class="card-header">
     <i class="bi bi-clipboard-check" style="color:#a78bfa"></i> Juicios evaluativos
-    <?php if ($filtroJuicio): ?>
-      <span class="je-badge <?= $filtroJuicio === 'Aprobado' ? 'je-badge-green' : 'je-badge-gray' ?> ms-2"><?= e($filtroJuicio) ?></span>
-    <?php endif; ?>
+    <span class="juicios-conteo"><?= count($juiciosFiltrados) ?> de <?= count($juiciosDetalle) ?> resultados</span>
   </div>
+  <form method="GET" class="juicios-filtros">
+    <?php foreach ($paramsBase as $nombre => $valor): ?>
+      <input type="hidden" name="<?= e($nombre) ?>" value="<?= e($valor) ?>">
+    <?php endforeach; ?>
+    <div class="filtro-campo">
+      <label class="je-label" for="f-juicio">Juicio</label>
+      <select class="je-input w-100" id="f-juicio" name="juicio" onchange="this.form.submit()">
+        <option value="">Todos</option>
+        <option value="Aprobado" <?= $filtroJuicio === 'Aprobado' ? 'selected' : '' ?>>Aprobados</option>
+        <option value="Pendiente" <?= $filtroJuicio === 'Pendiente' ? 'selected' : '' ?>>Pendientes</option>
+      </select>
+    </div>
+    <div class="filtro-campo filtro-ancho">
+      <label class="je-label" for="f-competencia">Competencia</label>
+      <select class="je-input w-100" id="f-competencia" name="competencia" onchange="this.form.submit()">
+        <option value="">Todas las competencias</option>
+        <?php foreach ($opcionesCompetencia as $idComp => $nombreComp): ?>
+          <option value="<?= (int)$idComp ?>" <?= $filtroCompetencia === (int)$idComp ? 'selected' : '' ?>><?= e($nombreComp) ?></option>
+        <?php endforeach; ?>
+      </select>
+    </div>
+    <div class="filtro-campo">
+      <label class="je-label" for="f-instructor">Instructor</label>
+      <select class="je-input w-100" id="f-instructor" name="instructor" onchange="this.form.submit()">
+        <option value="">Todos los instructores</option>
+        <?php foreach ($opcionesInstructor as $instructor): ?>
+          <option value="<?= e($instructor) ?>" <?= $filtroInstructor === $instructor ? 'selected' : '' ?>><?= e(nombreFuncionario($instructor)) ?></option>
+        <?php endforeach; ?>
+        <?php if ($haySinInstructor): ?>
+          <option value="<?= SIN_INSTRUCTOR ?>" <?= $filtroInstructor === SIN_INSTRUCTOR ? 'selected' : '' ?>>Sin instructor (por evaluar)</option>
+        <?php endif; ?>
+      </select>
+    </div>
+    <div class="filtro-campo filtro-ancho">
+      <label class="je-label" for="f-q">Buscar</label>
+      <div style="display:flex;gap:6px">
+        <input class="je-input w-100" type="search" id="f-q" name="q" value="<?= e($filtroTexto) ?>" placeholder="Resultado, competencia o instructor">
+        <button type="submit" class="je-btn je-btn-primary je-btn-sm icon-only" title="Buscar" aria-label="Buscar"><i class="bi bi-search"></i></button>
+      </div>
+    </div>
+    <?php if ($filtrosActivos): ?>
+      <a href="<?= e($urlPagina()) ?>" class="je-btn je-btn-outline je-btn-sm filtro-limpiar"><i class="bi bi-x-lg"></i> Limpiar filtros</a>
+    <?php endif; ?>
+  </form>
   <div class="card-body p-0">
     <?php if (empty($juiciosFiltrados)): ?>
-      <p style="text-align:center;color:var(--text-muted);padding:3rem;margin:0">No hay juicios evaluativos para este filtro.</p>
+      <p style="text-align:center;color:var(--text-muted);padding:3rem;margin:0">No hay juicios evaluativos que coincidan con los filtros.</p>
     <?php else: ?>
       <div class="table-responsive">
         <table class="je-table mb-0">
@@ -173,7 +246,7 @@ $urlPendientes = $urlPagina(['juicio' => 'Pendiente']);
               <td class="table-muted">
                 <?= $j['fecha_juicio'] ? date('d/m/Y', strtotime($j['fecha_juicio'])) : '-' ?>
               </td>
-              <td class="table-muted"><?= $j['funcionario'] ? e($j['funcionario']) : '-' ?></td>
+              <td class="table-muted"><?= $j['funcionario'] ? e(nombreFuncionario($j['funcionario'])) : 'Sin instructor' ?></td>
             </tr>
             <?php endforeach; ?>
           </tbody>

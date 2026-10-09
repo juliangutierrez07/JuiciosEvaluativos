@@ -85,6 +85,11 @@ function getResumenGlobal(): array {
     return compact('total','formacion','retiro','traslado','aprobados','pendientes');
 }
 
+// Sofía Plus registra al evaluador como "CC 123456 - NOMBRE"; se muestra solo el nombre.
+function nombreFuncionario(string $funcionario): string {
+    return preg_replace('/^[A-Z]{1,3}\s*\d+\s*-\s*/u', '', trim($funcionario));
+}
+
 // ── Badges visuales (por color según diagrama) ───────────────────────────────
 
 function badgeEstado(string $estado): string {
