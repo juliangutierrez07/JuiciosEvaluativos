@@ -82,6 +82,7 @@ CREATE TABLE IF NOT EXISTS importaciones (
   nombre_archivo varchar(255) NOT NULL,
   programa_id int unsigned NOT NULL,
   ficha_id int unsigned NOT NULL,
+  usuario_id int unsigned DEFAULT NULL,
   total_filas int unsigned NOT NULL DEFAULT 0,
   filas_procesadas int unsigned NOT NULL DEFAULT 0,
   filas_omitidas int unsigned NOT NULL DEFAULT 0,
@@ -90,8 +91,31 @@ CREATE TABLE IF NOT EXISTS importaciones (
   PRIMARY KEY (id),
   KEY fk_import_programa (programa_id),
   KEY fk_import_ficha (ficha_id),
+  KEY idx_import_usuario (usuario_id),
   CONSTRAINT fk_import_ficha FOREIGN KEY (ficha_id)
     REFERENCES fichas (id) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT fk_import_programa FOREIGN KEY (programa_id)
     REFERENCES programas (id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS usuarios (
+  id int unsigned NOT NULL AUTO_INCREMENT,
+  usuario varchar(60) NOT NULL,
+  nombre varchar(255) NOT NULL,
+  rol enum('admin','instructor') NOT NULL DEFAULT 'instructor',
+  password_hash varchar(255) NOT NULL,
+  debe_cambiar tinyint(1) NOT NULL DEFAULT 0,
+  activo tinyint(1) NOT NULL DEFAULT 1,
+  ultimo_acceso datetime DEFAULT NULL,
+  created_at timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_usuarios_usuario (usuario)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS intentos_login (
+  id int unsigned NOT NULL AUTO_INCREMENT,
+  identificador varchar(100) NOT NULL,
+  created_at timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (id),
+  KEY idx_intentos_identificador (identificador, created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

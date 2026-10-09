@@ -1,6 +1,7 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) session_start();
 require_once __DIR__ . '/functions.php';
+// Cada página puede declarar $rolRequerido antes de incluir el encabezado.
+$usuarioSesion = requireRol($rolRequerido ?? ROLES_PERSONAL);
 $flash = getFlash();
 $csrfToken = csrfToken();
 
@@ -45,6 +46,11 @@ function isActiveRoot(string $file): string {
   </a>
 
   <ul class="sidebar-nav">
+<?php if ($usuarioSesion['rol'] === 'aprendiz'): ?>
+    <li><a href="<?= base('modules/portal/index.php') ?>"<?= isActive('portal') ?>>
+      <i class="bi bi-clipboard-check"></i> Mis juicios
+    </a></li>
+<?php else: ?>
     <li><a href="<?= base('index.php') ?>"<?= isActiveRoot('index.php') ?>>
       <i class="bi bi-grid-1x2-fill"></i> Dashboard
     </a></li>
@@ -70,9 +76,36 @@ function isActiveRoot(string $file): string {
     <li><a href="<?= base('modules/mapa/index.php') ?>"<?= isActive('mapa') ?>>
       <i class="bi bi-grid-3x3-gap-fill"></i> Mapa de calor
     </a></li>
+
+<?php if ($usuarioSesion['rol'] === 'admin'): ?>
+    <li class="nav-section-label">Administración</li>
+
+    <li><a href="<?= base('modules/usuarios/index.php') ?>"<?= isActive('usuarios') ?>>
+      <i class="bi bi-person-badge-fill"></i> Usuarios
+    </a></li>
+<?php endif; ?>
+
+    <li><a href="<?= base('cambiar_clave.php') ?>"<?= isActiveRoot('cambiar_clave.php') ?>>
+      <i class="bi bi-key-fill"></i> Cambiar contraseña
+    </a></li>
+<?php endif; ?>
   </ul>
 
-  <div class="sidebar-footer"></div>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <i class="bi bi-person-circle"></i>
+      <div class="sidebar-user-text">
+        <div class="sidebar-user-name"><?= e($usuarioSesion['nombre']) ?></div>
+        <div class="sidebar-user-role"><?= e(nombreRol($usuarioSesion['rol'])) ?></div>
+      </div>
+    </div>
+    <form method="POST" action="<?= base('logout.php') ?>">
+      <input type="hidden" name="csrf_token" value="<?= e($csrfToken) ?>">
+      <button type="submit" class="je-btn je-btn-outline je-btn-sm w-100" style="justify-content:center">
+        <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+      </button>
+    </form>
+  </div>
 </nav>
 
 <div id="main-wrapper">

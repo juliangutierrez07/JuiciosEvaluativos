@@ -94,6 +94,7 @@ function tarjetaFichaNew(array $f, array $estados, int $totalAp): void { ?>
         <a href="../aprendices/index.php?ficha_id=<?= $f['id'] ?>" class="je-btn je-btn-primary je-btn-sm">
           <i class="bi bi-people-fill"></i> Ver aprendices
         </a>
+        <?php if (esAdmin()): ?>
         <button type="button" class="je-btn je-btn-danger je-btn-sm"
                 data-bs-toggle="modal" data-bs-target="#modalEliminar"
                 data-ficha-id="<?= $f['id'] ?>"
@@ -101,6 +102,7 @@ function tarjetaFichaNew(array $f, array $estados, int $totalAp): void { ?>
                 data-ficha-total="<?= $totalAp ?>">
           <i class="bi bi-trash"></i>
         </button>
+        <?php endif; ?>
       </div>
     </div>
   </div>
@@ -147,6 +149,7 @@ function tarjetaFichaNew(array $f, array $estados, int $totalAp): void { ?>
   <?php endif; ?>
 <?php endif; ?>
 
+<?php if (esAdmin()): ?>
 <!-- Modal eliminar -->
 <div class="modal fade" id="modalEliminar" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
@@ -190,5 +193,6 @@ document.getElementById('formEliminarFicha').addEventListener('submit', function
   boton.innerHTML = '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Eliminando…';
 });
 </script>
+<?php endif; ?>
 
 <?php require_once __DIR__ . '/../../includes/footer.php'; ?>

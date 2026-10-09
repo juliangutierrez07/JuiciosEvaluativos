@@ -16,6 +16,7 @@ $db = getDB();
         <div class="card-header"><i class="bi bi-upload"></i> Subir archivo</div>
         <div class="card-body">
           <form action="procesar.php" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="<?= e($csrfToken) ?>">
             <label class="je-label">Archivo Excel <span style="color:#f87171">*</span></label>
             <div class="drop-zone mb-4">
               <i class="dz-icon bi bi-cloud-upload"></i>

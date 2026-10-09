@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../includes/functions.php';
+requireRol('admin');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') redirect('index.php');
 
@@ -40,7 +41,7 @@ try {
     flash('success', 'Ficha <strong>' . htmlspecialchars($ficha['numero']) . '</strong> eliminada correctamente junto con todos sus aprendices y juicios.');
 } catch (Throwable $e) {
     if ($db->inTransaction()) $db->rollBack();
-    flash('danger', 'Error al eliminar: ' . $e->getMessage());
+    flash('danger', 'Error al eliminar: ' . e($e->getMessage()));
 }
 
 redirect('index.php');

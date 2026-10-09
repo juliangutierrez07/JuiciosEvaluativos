@@ -1,7 +1,13 @@
 <?php
 require_once __DIR__ . '/../../includes/functions.php';
+requireRol(ROLES_PERSONAL);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') redirect('index.php');
+
+if (!csrfValido($_POST['csrf_token'] ?? null)) {
+    flash('danger', 'La solicitud expiró o no es válida. Inténtalo nuevamente.');
+    redirect('index.php');
+}
 
 if (empty($_FILES['archivoExcel']['tmp_name'])) {
     flash('danger', 'No se recibió ningún archivo.');
@@ -21,7 +27,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 try {
     $spreadsheet = IOFactory::load($_FILES['archivoExcel']['tmp_name']);
 } catch (Throwable $e) {
-    flash('danger', 'No se pudo leer el Excel: ' . $e->getMessage());
+    flash('danger', 'No se pudo leer el Excel: ' . e($e->getMessage()));
     redirect('index.php');
 }
 
@@ -152,16 +158,16 @@ try {
     $db->commit();
 } catch (Throwable $e) {
     $db->rollBack();
-    flash('danger', 'Error durante la importación: ' . $e->getMessage());
+    flash('danger', 'Error durante la importación: ' . e($e->getMessage()));
     redirect('index.php');
 }
 
 // ── Log ──────────────────────────────────────────────────────────────────────
 $db->prepare(
-    'INSERT INTO importaciones (nombre_archivo, programa_id, ficha_id, total_filas, filas_procesadas, filas_omitidas, estado)
-     VALUES (?,?,?,?,?,?,?)'
+    'INSERT INTO importaciones (nombre_archivo, programa_id, ficha_id, usuario_id, total_filas, filas_procesadas, filas_omitidas, estado)
+     VALUES (?,?,?,?,?,?,?,?)'
 )->execute([
-    $originalName, $programaId, $fichaId, $totalFilas, $procesadas, $omitidas,
+    $originalName, $programaId, $fichaId, (int)usuarioActual()['id'], $totalFilas, $procesadas, $omitidas,
     $omitidas > 0 ? 'Con errores' : 'Exitoso'
 ]);
 

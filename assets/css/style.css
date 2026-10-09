@@ -981,3 +981,73 @@ table.dataTable tbody td { border-bottom: 1px solid rgba(255,255,255,.04); color
   .heatmap-table .ficha-col { left: 194px; }
   .competence-key-grid { grid-template-columns: 1fr; }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   SESIÓN Y ACCESO
+   ═══════════════════════════════════════════════════════════ */
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  text-align: left;
+}
+.sidebar-user > .bi { font-size: 1.6rem; color: #a78bfa; flex-shrink: 0; }
+.sidebar-user-text { min-width: 0; }
+.sidebar-user-name {
+  color: var(--text-main);
+  font-weight: 600;
+  font-size: .78rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sidebar-user-role { color: var(--text-muted); font-size: .68rem; }
+
+.auth-page {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+.auth-card { width: 100%; max-width: 420px; }
+.auth-card .card-body { padding: 32px 28px; }
+.auth-card .je-input { width: 100%; }
+.auth-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+.auth-brand .brand-icon {
+  width: 44px; height: 44px;
+  background: linear-gradient(135deg, var(--accent), #4f46e5);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem; color: #fff;
+  box-shadow: 0 4px 14px var(--accent-glow);
+}
+.auth-brand h1 { font-size: 1.25rem; font-weight: 800; color: #fff; margin: 0; }
+.auth-brand p { font-size: .8rem; color: var(--text-muted); margin: 0; }
+.auth-hint { font-size: .75rem; color: var(--text-muted); margin-top: 18px; line-height: 1.5; }
+.auth-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 20px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+}
+.auth-tabs a {
+  flex: 1;
+  text-align: center;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: background var(--transition), color var(--transition);
+}
+.auth-tabs a:hover { color: var(--text-main); }
+.auth-tabs a.active { background: var(--accent); color: #fff; }

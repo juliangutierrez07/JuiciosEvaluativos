@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/auth.php';
 
 // ── Helpers de salida ────────────────────────────────────────────────────────
 
@@ -15,12 +16,12 @@ function redirect(string $url): void {
 // ── Mensajes flash ───────────────────────────────────────────────────────────
 
 function flash(string $type, string $message): void {
-    if (session_status() === PHP_SESSION_NONE) session_start();
+    iniciarSesion();
     $_SESSION['flash'] = ['type' => $type, 'message' => $message];
 }
 
 function getFlash(): ?array {
-    if (session_status() === PHP_SESSION_NONE) session_start();
+    iniciarSesion();
     if (!isset($_SESSION['flash'])) return null;
     $f = $_SESSION['flash'];
     unset($_SESSION['flash']);
@@ -39,12 +40,10 @@ function csrfToken(): string {
     }
 
     $token = bin2hex(random_bytes(32));
-    $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-        || strtolower($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https';
     setcookie('csrf_token', $token, [
         'expires' => time() + 86400,
         'path' => '/',
-        'secure' => $https,
+        'secure' => conexionSegura(),
         'httponly' => true,
         'samesite' => 'Strict',
     ]);
